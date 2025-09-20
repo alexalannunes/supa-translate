@@ -1,22 +1,22 @@
 # ✅ Roadmap / Tasks – Projeto Next.js + Google Cloud Translate + Shadcn
 
 ## 🗂️ Setup do Projeto
-- [ ] Criar projeto Next.js 14 com TypeScript (`npx create-next-app@latest`).
-- [ ] Configurar App Router.
-- [ ] Instalar Tailwind CSS e configurar.
+- [x] Criar projeto Next.js 14 com TypeScript (`npx create-next-app@latest`).
+- [x] Configurar App Router.
+- [x] Instalar Tailwind CSS e configurar.
 - [ ] Instalar Shadcn/UI e gerar componentes base (Button, Input, Select etc.).
-- [ ] Criar arquivo `.env.local` para variáveis de ambiente.
+- [x] Criar arquivo `.env.local` para variáveis de ambiente.
 
 ## 🔑 Integração Google Cloud Translate
-- [ ] Criar projeto no Google Cloud Console.
-- [ ] Ativar a API Cloud Translate.
-- [ ] Criar chave de API e copiar para `.env.local` (`GOOGLE_API_KEY`).
+- [x] Criar projeto no Google Cloud Console.
+- [x] Ativar a API Cloud Translate.
+- [x] Criar chave de API e copiar para `.env.local` (`GOOGLE_API_KEY`).
 - [ ] Criar utilitário `lib/google.ts` para chamar a API Cloud Translate.
 
 ## 🖥️ Backend / Server Actions ou API Routes
 - [ ] Escolher abordagem: Server Actions **ou** API Routes.
 - [ ] Implementar função/endpoint `translateText` que recebe texto + idioma destino e retorna tradução.
-- [ ] Garantir que a chave da API fique segura no servidor.
+- [x] Garantir que a chave da API fique segura no servidor.
 
 ## 🎨 Frontend
 - [ ] Criar `components/TranslateForm.tsx` com:

@@ -1,5 +1,7 @@
 "use client";
 
+console.log(process.env);
+
 import Image from "next/image";
 export default function Home() {
   return (
