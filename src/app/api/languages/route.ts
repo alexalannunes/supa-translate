@@ -1,6 +1,6 @@
 import { SERVER_ERROR_STATUS } from "@/constants/http-status";
 import { IS_DEV } from "@/constants/is-dev";
-import { google } from "@/lib/google";
+import { googleHttp } from "@/lib/google-http";
 import { NextResponse } from "next/server";
 
 // const redis = Redis.fromEnv();
@@ -14,7 +14,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const request = await google.get("/languages", {
+    const request = await googleHttp.get("/languages", {
       params: {
         target: "pt", // display name based on target
       },

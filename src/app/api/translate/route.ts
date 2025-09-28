@@ -3,7 +3,7 @@ import {
   SERVER_ERROR_STATUS,
 } from "@/constants/http-status";
 import { IS_DEV } from "@/constants/is-dev";
-import { google } from "@/lib/google";
+import { googleHttp } from "@/lib/google-http";
 import { NextResponse } from "next/server";
 import z, { ZodError } from "zod";
 
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
   try {
     const result = schema.parse(body);
 
-    const request = await google.post(
+    const request = await googleHttp.post(
       process.env.GOOGLE_TRANSLATION_API,
       null,
       {
