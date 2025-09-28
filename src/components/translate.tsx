@@ -360,7 +360,7 @@ export function Translate() {
         </div>
         <div className="flex gap-3 w-full min-h-52">
           <Textarea className="resize-none" />
-          <Textarea className="resize-none" />
+          <Textarea className="resize-none" readOnly />
         </div>
       </main>
     </div>

@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
-import z, { ZodError } from "zod";
-import axios from "axios";
-import { IS_DEV } from "@/constants/is-dev";
 import {
   BAD_REQUEST_STATUS,
   SERVER_ERROR_STATUS,
 } from "@/constants/http-status";
+import { IS_DEV } from "@/constants/is-dev";
+import { google } from "@/lib/google";
+import { NextResponse } from "next/server";
+import z, { ZodError } from "zod";
 
 // const redis = Redis.fromEnv();
 
@@ -55,13 +55,16 @@ export async function POST(request: Request) {
   try {
     const result = schema.parse(body);
 
-    const request = await axios.post(process.env.GOOGLE_TRANSLATION_API, null, {
-      params: {
-        ...result,
-        format: "text",
-        key: process.env.GOOGLE_API_KEY,
-      },
-    });
+    const request = await google.post(
+      process.env.GOOGLE_TRANSLATION_API,
+      null,
+      {
+        params: {
+          ...result,
+          format: "text",
+        },
+      }
+    );
 
     return NextResponse.json({
       result: request.data,

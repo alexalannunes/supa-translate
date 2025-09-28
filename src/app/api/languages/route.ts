@@ -1,8 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import z, { ZodError } from "zod";
-import axios from "axios";
 import { SERVER_ERROR_STATUS } from "@/constants/http-status";
 import { IS_DEV } from "@/constants/is-dev";
+import { google } from "@/lib/google";
+import { NextResponse } from "next/server";
 
 // const redis = Redis.fromEnv();
 
@@ -13,17 +12,13 @@ import { IS_DEV } from "@/constants/is-dev";
 //   analytics: true,
 // });
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const request = await axios.get(
-      `${process.env.GOOGLE_TRANSLATION_API}/languages`,
-      {
-        params: {
-          target: "pt", // display name based on target
-          key: process.env.GOOGLE_API_KEY,
-        },
-      }
-    );
+    const request = await google.get("/languages", {
+      params: {
+        target: "pt", // display name based on target
+      },
+    });
 
     return NextResponse.json({
       result: request.data,
