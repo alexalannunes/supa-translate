@@ -4,59 +4,41 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { LANGUAGES_MOCK } from "@/mock/languages";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowBigDown, ArrowDown, ArrowLeftRight, Check } from "lucide-react";
+import { ArrowDown, ArrowLeftRight, Check } from "lucide-react";
 import { useQueryState } from "nuqs";
 
 import { Input } from "@/components/ui/input";
-import { RefObject, useState } from "react";
+import { useState } from "react";
 
 import { useEffect, useRef } from "react";
 
+import { useClickOutside } from "@/hooks/use-outside-click";
+import { RecentLanguage } from "@/types/recent-languages";
+import {
+  getRecentLanguages,
+  storeRecentLanguages,
+} from "@/utils/local-storage";
 import { AnimatePresence, motion } from "motion/react";
-import { useRouter } from "next/navigation";
-import { Skeleton } from "./ui/skeleton";
+import { TranslateSkeleton } from "./translate-skeleton";
 
-// TODO
-// page.tsx will be a server component (async component)
-// apply redirect if query params does not exist
-
-function useClickOutside(
-  ref: RefObject<HTMLElement | null>,
-  handler: () => void
-) {
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        handler();
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [ref, handler]);
-}
+const NOT_ADD_TO_RECENT = false;
+const RECENT_CACHE_TIME = 1000 * 60 * 60 * 24 * 7; // 1 week
 
 export function Translate() {
-  // TODO: we have some flash when load
-
   const [fromLang, setFromLang] = useQueryState("fl"); // fl = from language
   const [toLang, setToLang] = useQueryState("tl"); // tl = to language
-
   const [target, setTarget] = useState<"from" | "to" | null>(null);
-
   const [search, setSearch] = useState("");
-
-  // should be new set? store this
-  const [recent, setRecent] = useState<{ from: string[]; to: string[] }>(() => {
+  const [open, setOpen] = useState(false);
+  const [recentLanguages, setRecentLanguages] = useState<RecentLanguage>(() => {
     return {
       from: [],
       to: [],
     };
   });
 
-  const [open, setOpen] = useState(false);
+  // fl = pt, but [pt, xx,xx,xx,xx,xx,xx] -> pt is last because I slice(-3).sort desc
+  // BUG: previous language when is in the end of que array ins't highlighted
 
   const { data } = useQuery({
     queryKey: ["languages"],
@@ -66,28 +48,40 @@ export function Translate() {
       // return request.data;
 
       // or languages can has a prop called is_recent, target so I can check recently used
-      return LANGUAGES_MOCK;
+      return {
+        result: {
+          data: {
+            languages: LANGUAGES_MOCK.result.data.languages.filter(
+              (item) => item.language !== "zh-CN" // check this
+            ),
+          },
+        },
+      };
     },
   });
 
   const handleToggleLanguages = () => {
-    const existToLangInFrom = recent.from.find((item) => item === toLang);
-    const existFromLangInTo = recent.to.find((item) => item === fromLang);
+    const existToLangInFrom = recentLanguages.from.find(
+      (item) => item === toLang
+    );
+    const existFromLangInTo = recentLanguages.to.find(
+      (item) => item === fromLang
+    );
 
     if (!existToLangInFrom && toLang) {
-      setRecent((prev) => {
+      setRecentLanguages((prev) => {
         return {
           ...prev,
-          from: Array.from(new Set([...prev.from, toLang])),
+          from: Array.from(new Set([toLang, ...prev.from])),
         };
       });
     }
 
     if (!existFromLangInTo && fromLang) {
-      setRecent((prev) => {
+      setRecentLanguages((prev) => {
         return {
           ...prev,
-          to: Array.from(new Set([...prev.to, fromLang])),
+          to: Array.from(new Set([fromLang, ...prev.to])),
         };
       });
     }
@@ -104,81 +98,93 @@ export function Translate() {
     setSearch("");
   });
 
-  const recentFrom = recent.from
+  const recentFrom = recentLanguages.from
     .map((item) => {
       return data?.result.data?.languages.find((s) => s.language === item);
     })
+    .slice(0, 3)
     .filter((item) => !!item)
-    ?.slice(-3)
-    .map((item, index) => ({ index, ...item }))
-    .sort((a, b) => b.index - a.index);
+    .map((item, index) => ({ index, ...item }));
 
-  const recentTo = recent.to
+  const recentTo = recentLanguages.to
     .map((item) => {
       return data?.result.data?.languages.find((s) => s.language === item);
     })
+    .slice(0, 3)
     .filter((item) => !!item)
-    ?.slice(-3)
-    .map((item, index) => ({ index, ...item }))
-    .sort((a, b) => b.index - a.index);
+    .map((item, index) => ({ index, ...item }));
 
   useEffect(() => {
-    const recentStorage = JSON.parse(
-      window.localStorage.getItem("supa-translate:recent-languages") || "{}"
-    );
+    const recentStorage = getRecentLanguages();
 
-    console.log({ recentStorage });
-
-    const from: string[] = recentStorage?.from || [fromLang || "pt"];
-    const to: string[] = recentStorage?.to || [toLang || "en"];
-    setRecent({ from, to });
+    const from: string[] = recentStorage.from || [fromLang || "pt"];
+    const to: string[] = recentStorage.to || [toLang || "en"];
+    setRecentLanguages({ from, to });
   }, []);
 
+  const handleSelectLanguage = (
+    language: string,
+    newTarget?: "from" | "to",
+    addRecent = true /* good idea */
+  ) => {
+    const currentTarget = newTarget || target;
+
+    if (currentTarget === "from") {
+      // duplicated logic
+      if (language === toLang) {
+        setToLang(fromLang);
+      }
+      setFromLang(language);
+
+      if (fromLang && addRecent) {
+        setRecentLanguages((prev) => {
+          return {
+            ...prev,
+            from: Array.from(new Set([language, ...prev.from])),
+          };
+        });
+      }
+    } else {
+      // duplicated logic
+      if (language === fromLang) {
+        setFromLang(toLang);
+      }
+      setToLang(language);
+
+      if (toLang && addRecent) {
+        setRecentLanguages((prev) => {
+          return {
+            ...prev,
+            // add language before prev
+
+            to: Array.from(new Set([language, ...prev.to])),
+          };
+        });
+      }
+    }
+
+    setSearch("");
+    setOpen(false);
+  };
+
   useEffect(() => {
-    localStorage.setItem(
-      "supa-translate:recent-languages",
-      JSON.stringify(recent)
-    );
-  }, [recent]);
+    storeRecentLanguages(recentLanguages);
+  }, [recentLanguages]);
 
   const filteredLanguages =
-    data?.result.data.languages.filter((item) => {
-      return (
-        item.name.toLowerCase().includes(search.toLowerCase()) ||
-        item.language.toLowerCase().includes(search.toLowerCase())
-      );
-    }) || [];
+    data?.result.data.languages
+      .filter((item) => {
+        return (
+          item.name.toLowerCase().includes(search.toLowerCase()) ||
+          item.language.toLowerCase().includes(search.toLowerCase())
+        );
+      })
+      ?.sort((a, b) => a.name.localeCompare(b.name)) || [];
   // add skeleton
 
   // skeleton and isPending
-  if (!recent.from.length) {
-    return (
-      <div className="font-sans p-8 pb-20 gap-16">
-        <main className="flex flex-col gap-4 container mx-auto relative">
-          <div className="flex gap-3 w-full items-center">
-            <div className="w-full flex gap-2 items-center">
-              <Skeleton className="w-32 h-9" />
-              <Skeleton className="w-32 h-9" />
-              <Skeleton className="w-32 h-9" />
-              <Skeleton className="w-10 h-9" />
-            </div>
-            <div className="w-12">
-              <Skeleton className="w-10 h-9" />
-            </div>
-            <div className="w-full flex gap-2 items-center">
-              <Skeleton className="w-32 h-9" />
-              <Skeleton className="w-32 h-9" />
-              <Skeleton className="w-32 h-9" />
-              <Skeleton className="w-10 h-9" />
-            </div>
-          </div>
-          <div className="flex gap-3 w-full min-h-52">
-            <Skeleton className="w-full h-52" />
-            <Skeleton className="w-full h-52" />
-          </div>
-        </main>
-      </div>
-    );
+  if (!recentLanguages.from.length) {
+    return <TranslateSkeleton />;
   }
   return (
     <div className="font-sans p-8 pb-20 gap-16">
@@ -186,20 +192,10 @@ export function Translate() {
         <AnimatePresence>
           {open && (
             <motion.div
-              // remove elastic
-              transition={{
-                ease: "easeInOut",
-                duration: 0.1,
-              }}
-              initial={{
-                opacity: 0,
-                y: -5,
-              }}
+              transition={{ ease: "easeInOut", duration: 0.1 }}
+              initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{
-                opacity: 0,
-                y: -5,
-              }}
+              exit={{ opacity: 0, y: -5 }}
               ref={popoverRef}
               data-state={open ? "open" : "closed"}
               className="absolute top-13 bg-popover text-popover-foreground z-50 w-full rounded-md border p-4 shadow-md outline-hidden"
@@ -220,53 +216,7 @@ export function Translate() {
                       (toLang === lang.language && target === "to")
                     }
                     variant={"ghost"}
-                    onClick={() => {
-                      if (
-                        fromLang === lang.language ||
-                        toLang === lang.language
-                      ) {
-                        // setOpen(false);
-                        // swipe?
-                        return false;
-                      }
-                      if (target === "from") {
-                        // duplicated logic
-                        if (lang.language === toLang) {
-                          setToLang(fromLang);
-                        }
-                        setFromLang(lang.language);
-
-                        if (fromLang) {
-                          setRecent((prev) => {
-                            return {
-                              ...prev,
-                              from: Array.from(
-                                new Set([...prev.from, lang.language])
-                              ),
-                            };
-                          });
-                        }
-                      } else {
-                        // duplicated logic
-                        if (lang.language === fromLang) {
-                          setFromLang(toLang);
-                        }
-                        setToLang(lang.language);
-
-                        if (fromLang) {
-                          setRecent((prev) => {
-                            return {
-                              ...prev,
-                              to: Array.from(
-                                new Set([...prev.to, lang.language])
-                              ),
-                            };
-                          });
-                        }
-                      }
-
-                      // setOpen(false)
-                    }}
+                    onClick={() => handleSelectLanguage(lang.language)}
                   >
                     <Check className="size-3.5" />
                     {lang.name}
@@ -283,23 +233,17 @@ export function Translate() {
                 key={item?.language || item?.name}
                 variant={"outline"}
                 aria-selected={fromLang === item?.language}
-                className="aria-selected:bg-blue-100 aria-selected:text-blue-500 aria-selected:border-blue-300"
+                className="transition-none aria-selected:bg-blue-100 aria-selected:text-blue-500 aria-selected:border-blue-300"
                 onClick={() => {
-                  if (item.language === fromLang) {
-                    return;
-                  }
-
-                  if (item?.language) {
-                    setFromLang(item.language);
-                  }
-
-                  // duplicated logic
-                  if (item.language === toLang) {
-                    setToLang(fromLang);
-                  }
+                  if (item.language === fromLang) return;
+                  handleSelectLanguage(
+                    item.language,
+                    "from",
+                    NOT_ADD_TO_RECENT
+                  );
                 }}
               >
-                {item?.name}
+                {item?.name} - {item.language}
               </Button>
             ))}
 
@@ -330,16 +274,10 @@ export function Translate() {
                 data-key={item?.language || item?.name}
                 variant={"outline"}
                 aria-selected={toLang === item?.language}
-                className="aria-selected:bg-blue-100 aria-selected:text-blue-500 aria-selected:border-blue-300"
+                className="transition-none aria-selected:bg-blue-100 aria-selected:text-blue-500 aria-selected:border-blue-300"
                 onClick={() => {
-                  if (item?.language) {
-                    setToLang(item.language);
-                  }
-
-                  // duplicated logic
-                  if (item.language === fromLang) {
-                    setFromLang(toLang);
-                  }
+                  if (item.language === toLang) return;
+                  handleSelectLanguage(item.language, "to", NOT_ADD_TO_RECENT);
                 }}
               >
                 {item?.name}
