@@ -47,7 +47,6 @@ export function Translate() {
       // const request = await axios.get("http://localhost:3000/api/languages");
       // return request.data;
 
-      // or languages can has a prop called is_recent, target so I can check recently used
       return {
         result: {
           data: {
