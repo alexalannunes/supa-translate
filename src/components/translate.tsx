@@ -37,6 +37,8 @@ export function Translate() {
     };
   });
 
+  //
+
   // fl = pt, but [pt, xx,xx,xx,xx,xx,xx] -> pt is last because I slice(-3).sort desc
   // BUG: previous language when is in the end of que array ins't highlighted
 
