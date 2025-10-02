@@ -1,4 +1,4 @@
-import { Translate } from "@/components/translate";
+import { Translate } from "@/components/translate-page";
 import { redirect, RedirectType } from "next/navigation";
 import { use } from "react";
 

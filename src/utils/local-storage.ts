@@ -14,7 +14,9 @@ export function getRecentLanguages() {
   ) as RecentLanguage;
 
   return {
-    from: recentLangs?.from,
-    to: recentLangs?.to,
+    // actually, from must be en (or detect language), and to must be pt
+
+    from: !!recentLangs?.from.length ? recentLangs.from : ["pt"],
+    to: !!recentLangs?.to.length ? recentLangs.to : ["en"],
   };
 }
