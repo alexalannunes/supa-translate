@@ -2,20 +2,20 @@ import { Options } from "nuqs";
 import { RecentLanguage } from "./recent-languages";
 import { Dispatch, SetStateAction } from "react";
 
-export type TranslationTarget = "from" | "to";
+export type TranslateTarget = "from" | "to";
 
-export interface TranslationContextType {
+export interface TranslateContextType {
   fromLang: string | null;
   toLang: string | null;
 
-  target: TranslationTarget | null;
+  target: TranslateTarget | null;
 
   search: string;
   open: boolean;
   recentLanguages: RecentLanguage;
 }
 
-export interface TranslationContextDispatchType {
+export interface TranslateContextDispatchType {
   setFromLang: (
     value: string | ((old: string | null) => string | null) | null,
     options?: Options
@@ -25,7 +25,7 @@ export interface TranslationContextDispatchType {
     options?: Options
   ) => Promise<URLSearchParams>;
 
-  setTarget: Dispatch<SetStateAction<TranslationTarget | null>>;
+  setTarget: Dispatch<SetStateAction<TranslateTarget | null>>;
 
   setSearch: Dispatch<SetStateAction<string>>;
   setOpen: Dispatch<SetStateAction<boolean>>;

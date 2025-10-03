@@ -1,8 +1,8 @@
 "use client";
 
 import { useClickOutside } from "@/hooks/use-outside-click";
-import { useTranslationDispatch } from "@/hooks/use-translation-dispatch";
-import { useTranslationState } from "@/hooks/use-translation-state";
+import { useTranslateDispatch } from "@/hooks/use-translation-dispatch";
+import { useTranslateState } from "@/hooks/use-translation-state";
 import { useLanguages } from "@/services/queries/use-languages";
 import { useRef } from "react";
 
@@ -14,10 +14,10 @@ import { AnimatePresence, motion } from "motion/react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 
-export function TranslationLanguagePicker() {
-  const { search, open, fromLang, toLang, target } = useTranslationState();
+export function TranslateLanguagePicker() {
+  const { search, open, fromLang, toLang, target } = useTranslateState();
   const { setSearch, setOpen, setTarget, onSelectLanguage } =
-    useTranslationDispatch();
+    useTranslateDispatch();
 
   const popoverRef = useRef<HTMLDivElement>(null);
 
@@ -80,9 +80,9 @@ export function TranslationLanguagePicker() {
   );
 }
 
-export function TranslationRecentFromLanguages() {
-  const { recentLanguages, fromLang } = useTranslationState();
-  const { onSelectLanguage, setOpen, setTarget } = useTranslationDispatch();
+export function TranslateRecentFromLanguages() {
+  const { recentLanguages, fromLang } = useTranslateState();
+  const { onSelectLanguage, setOpen, setTarget } = useTranslateDispatch();
 
   const { data } = useLanguages();
 
@@ -124,10 +124,9 @@ export function TranslationRecentFromLanguages() {
   );
 }
 
-export function TranslationSwapLanguage() {
-  const { recentLanguages, fromLang, toLang } = useTranslationState();
-  const { setFromLang, setToLang, setRecentLanguages } =
-    useTranslationDispatch();
+export function TranslateSwapLanguage() {
+  const { recentLanguages, fromLang, toLang } = useTranslateState();
+  const { setFromLang, setToLang, setRecentLanguages } = useTranslateDispatch();
   const handleToggleLanguages = () => {
     const existToLangInFrom = recentLanguages.from.find(
       (item) => item === toLang
@@ -164,9 +163,9 @@ export function TranslationSwapLanguage() {
   );
 }
 
-export function TranslationRecentToLanguages() {
-  const { recentLanguages, fromLang, toLang } = useTranslationState();
-  const { onSelectLanguage, setOpen, setTarget } = useTranslationDispatch();
+export function TranslateRecentToLanguages() {
+  const { recentLanguages, fromLang, toLang } = useTranslateState();
+  const { onSelectLanguage, setOpen, setTarget } = useTranslateDispatch();
 
   const { data } = useQuery({
     queryKey: ["languages"],
@@ -227,7 +226,7 @@ export function TranslationRecentToLanguages() {
   );
 }
 
-export function TranslationRecordButton() {
+export function TranslateRecordButton() {
   return (
     <Button size={"icon"} variant={"outline"}>
       <Mic />
@@ -235,7 +234,7 @@ export function TranslationRecordButton() {
   );
 }
 
-export function TranslationSpeakButton() {
+export function TranslateSpeakButton() {
   return (
     <Button size={"icon"} variant={"outline"}>
       <Volume2 />

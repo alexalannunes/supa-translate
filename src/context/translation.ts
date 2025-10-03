@@ -1,10 +1,10 @@
 import {
-  TranslationContextDispatchType,
-  TranslationContextType,
+  TranslateContextDispatchType,
+  TranslateContextType,
 } from "@/types/translate";
 import { createContext, useContext } from "react";
 
-export const TranslationContext = createContext<TranslationContextType>({
+export const TranslateContext = createContext<TranslateContextType>({
   fromLang: null,
   toLang: null,
   target: null,
@@ -16,11 +16,11 @@ export const TranslationContext = createContext<TranslationContextType>({
   },
 });
 
-TranslationContext.displayName = "TranslationProvider";
+TranslateContext.displayName = "TranslateProvider";
 
-export const TranslationDispatchContext =
-  createContext<TranslationContextDispatchType>(
-    {} as TranslationContextDispatchType
+export const TranslateDispatchContext =
+  createContext<TranslateContextDispatchType>(
+    {} as TranslateContextDispatchType
   );
 
-TranslationDispatchContext.displayName = "TranslationDispatchProvider";
+TranslateDispatchContext.displayName = "TranslateDispatchProvider";

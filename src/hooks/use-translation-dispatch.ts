@@ -1,12 +1,12 @@
-import { TranslationDispatchContext } from "@/context/translation";
+import { TranslateDispatchContext } from "@/context/translation";
 import { useContext } from "react";
 
-export function useTranslationDispatch() {
-  const context = useContext(TranslationDispatchContext);
+export function useTranslateDispatch() {
+  const context = useContext(TranslateDispatchContext);
 
   if (context === undefined) {
     throw new Error(
-      "useTranslationDispatch should be inside TranslationDispatchContext"
+      "useTranslateDispatch should be inside TranslateDispatchContext"
     );
   }
 

@@ -5,8 +5,8 @@ import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 
 import {
-  TranslationContext,
-  TranslationDispatchContext,
+  TranslateContext,
+  TranslateDispatchContext,
 } from "@/context/translation";
 import { RecentLanguage } from "@/types/recent-languages";
 import {
@@ -14,12 +14,12 @@ import {
   storeRecentLanguages,
 } from "@/utils/local-storage";
 import {
-  TranslationLanguagePicker,
-  TranslationRecentFromLanguages,
-  TranslationRecentToLanguages,
-  TranslationRecordButton,
-  TranslationSpeakButton,
-  TranslationSwapLanguage,
+  TranslateLanguagePicker,
+  TranslateRecentFromLanguages,
+  TranslateRecentToLanguages,
+  TranslateRecordButton,
+  TranslateSpeakButton,
+  TranslateSwapLanguage,
 } from "./translate";
 
 export function Translate() {
@@ -105,7 +105,7 @@ export function Translate() {
   // }
 
   return (
-    <TranslationContext.Provider
+    <TranslateContext.Provider
       value={{
         fromLang,
         toLang,
@@ -115,7 +115,7 @@ export function Translate() {
         target,
       }}
     >
-      <TranslationDispatchContext.Provider
+      <TranslateDispatchContext.Provider
         value={{
           setFromLang,
           setToLang,
@@ -128,36 +128,36 @@ export function Translate() {
       >
         <div className="font-sans p-8 pb-20 gap-16">
           <main className="flex flex-col gap-4 container mx-auto relative">
-            <TranslationLanguagePicker />
+            <TranslateLanguagePicker />
             <div className="flex gap-3 w-full items-center">
               <div className="w-full flex gap-2 items-center">
-                <TranslationRecentFromLanguages />
+                <TranslateRecentFromLanguages />
               </div>
               <div className="w-12">
-                <TranslationSwapLanguage />
+                <TranslateSwapLanguage />
               </div>
               <div className="w-full flex gap-2 items-center">
-                <TranslationRecentToLanguages />
+                <TranslateRecentToLanguages />
               </div>
             </div>
             <div className="flex gap-3 w-full min-h-52">
               <div className="relative w-full space-y-2">
                 <Textarea className="resize-none h-full pb-12" />
                 <div className="flex gap-2 absolute bottom-2 left-2">
-                  <TranslationRecordButton />
-                  <TranslationSpeakButton />
+                  <TranslateRecordButton />
+                  <TranslateSpeakButton />
                 </div>
               </div>
               <div className="relative w-full space-y-2">
                 <Textarea className="resize-none h-full pb-12" readOnly />
                 <div className="flex gap-2 absolute bottom-2 left-2">
-                  <TranslationSpeakButton />
+                  <TranslateSpeakButton />
                 </div>
               </div>
             </div>
           </main>
         </div>
-      </TranslationDispatchContext.Provider>
-    </TranslationContext.Provider>
+      </TranslateDispatchContext.Provider>
+    </TranslateContext.Provider>
   );
 }
