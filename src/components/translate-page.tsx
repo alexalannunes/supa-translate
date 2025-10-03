@@ -22,7 +22,7 @@ import {
   TranslateSwapLanguage,
 } from "./translate";
 
-export function Translate() {
+export function TranslatePage() {
   const [fromLang, setFromLang] = useQueryState("fl"); // fl = from language
   const [toLang, setToLang] = useQueryState("tl"); // tl = to language
   const [target, setTarget] = useState<"from" | "to" | null>(null);

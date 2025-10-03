@@ -125,17 +125,14 @@ export function TranslateRecentFromLanguages() {
 }
 
 export function TranslateSwapLanguage() {
-  const { recentLanguages, fromLang, toLang } = useTranslateState();
+  const { fromLang, toLang } = useTranslateState();
   const { setFromLang, setToLang, setRecentLanguages } = useTranslateDispatch();
-  const handleToggleLanguages = () => {
-    const existToLangInFrom = recentLanguages.from.find(
-      (item) => item === toLang
-    );
-    const existFromLangInTo = recentLanguages.to.find(
-      (item) => item === fromLang
-    );
 
-    if (!existToLangInFrom && toLang) {
+  const handleSwapLanguages = () => {
+    // NOTE: in google translate, selected language does not move
+
+    // always set language as first when swap
+    if (toLang) {
       setRecentLanguages((prev) => {
         return {
           ...prev,
@@ -144,20 +141,23 @@ export function TranslateSwapLanguage() {
       });
     }
 
-    if (!existFromLangInTo && fromLang) {
+    // always set language as first when swap
+    if (fromLang) {
       setRecentLanguages((prev) => {
         return {
           ...prev,
           to: Array.from(new Set([fromLang, ...prev.to])),
         };
       });
+    } else {
+      console.log("else []to");
     }
 
     setFromLang(toLang);
     setToLang(fromLang);
   };
   return (
-    <Button size={"icon"} onClick={handleToggleLanguages} variant={"outline"}>
+    <Button size={"icon"} onClick={handleSwapLanguages} variant={"outline"}>
       <ArrowLeftRight />
     </Button>
   );

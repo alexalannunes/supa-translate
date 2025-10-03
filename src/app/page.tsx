@@ -1,4 +1,4 @@
-import { Translate } from "@/components/translate-page";
+import { TranslatePage } from "@/components/translate-page";
 import { redirect, RedirectType } from "next/navigation";
 import { use } from "react";
 
@@ -16,5 +16,5 @@ export default function Home({ searchParams }: PageProps) {
     redirect("/?fl=pt&tl=en", RedirectType.replace);
   }
 
-  return <Translate />;
+  return <TranslatePage />;
 }
