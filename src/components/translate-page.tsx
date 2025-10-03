@@ -14,6 +14,7 @@ import {
   storeRecentLanguages,
 } from "@/utils/local-storage";
 import {
+  TranslateEditableTextarea,
   TranslateLanguagePicker,
   TranslateRecentFromLanguages,
   TranslateRecentToLanguages,
@@ -35,10 +36,11 @@ export function TranslatePage() {
     };
   });
 
-  //
+  const [debouncedUserInput, setDebouncedUserInput] = useState("");
 
-  // fl = pt, but [pt, xx,xx,xx,xx,xx,xx] -> pt is last because I slice(-3).sort desc
-  // BUG: previous language when is in the end of que array ins't highlighted
+  // temporary debounce logic
+
+  console.log({ debouncedUserInput });
 
   useEffect(() => {
     const recentStorage = getRecentLanguages();
@@ -142,7 +144,9 @@ export function TranslatePage() {
             </div>
             <div className="flex gap-3 w-full min-h-52">
               <div className="relative w-full space-y-2">
-                <Textarea className="resize-none h-full pb-12" />
+                <TranslateEditableTextarea
+                  onValueChange={setDebouncedUserInput}
+                />
                 <div className="flex gap-2 absolute bottom-2 left-2">
                   <TranslateRecordButton />
                   <TranslateSpeakButton />

@@ -4,7 +4,7 @@ import { useClickOutside } from "@/hooks/use-outside-click";
 import { useTranslateDispatch } from "@/hooks/use-translation-dispatch";
 import { useTranslateState } from "@/hooks/use-translation-state";
 import { useLanguages } from "@/services/queries/use-languages";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { NOT_ADD_TO_RECENT } from "@/constants/config";
 import { LANGUAGES_MOCK } from "@/mock/languages";
@@ -13,6 +13,7 @@ import { ArrowDown, ArrowLeftRight, Check, Mic, Volume2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 
 export function TranslateLanguagePicker() {
   const { search, open, fromLang, toLang, target } = useTranslateState();
@@ -93,6 +94,7 @@ export function TranslateRecentFromLanguages() {
     .slice(0, 3)
     .filter((item) => !!item)
     .map((item, index) => ({ index, ...item }));
+
   return (
     <>
       {recentFrom.map((item) => (
@@ -235,9 +237,45 @@ export function TranslateRecordButton() {
 }
 
 export function TranslateSpeakButton() {
+  // check compatibility
+
+  const handleSpeak = () => {
+    let utterance = new SpeechSynthesisUtterance("Olá");
+
+    speechSynthesis.speak(utterance);
+  };
+
   return (
-    <Button size={"icon"} variant={"outline"}>
+    <Button size={"icon"} variant={"outline"} onClick={handleSpeak}>
       <Volume2 />
     </Button>
+  );
+}
+
+export function TranslateEditableTextarea({
+  onValueChange,
+}: {
+  onValueChange: (value: string) => void;
+}) {
+  const [userInput, setUserInput] = useState("");
+
+  useEffect(() => {
+    const handler = () => {
+      onValueChange(userInput);
+    };
+
+    const timer = setTimeout(handler, 500);
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [userInput]);
+
+  return (
+    <Textarea
+      className="resize-none h-full pb-12"
+      value={userInput}
+      onChange={(e) => setUserInput(e.target.value)}
+    />
   );
 }
