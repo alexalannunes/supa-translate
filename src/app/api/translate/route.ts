@@ -25,7 +25,7 @@ const schema = z.object({
 type Body = z.infer<typeof schema>;
 
 // format and key are in backend
-
+// convert to GET
 export async function POST(request: Request) {
   let body: Body = {} as Body;
 

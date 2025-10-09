@@ -3,7 +3,7 @@
 import { useClickOutside } from "@/hooks/use-outside-click";
 import { useTranslateDispatch } from "@/hooks/use-translation-dispatch";
 import { useTranslateState } from "@/hooks/use-translation-state";
-import { useLanguages } from "@/services/queries/use-languages";
+import { useLanguages } from "@/services/translate/use-languages.query";
 import { useEffect, useRef, useState } from "react";
 
 import { NOT_ADD_TO_RECENT } from "@/constants/config";
@@ -58,7 +58,7 @@ export function TranslateLanguagePicker() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <div className="grid grid-cols-6 gap-2 p-2 max-h-[420px] overflow-y-auto mt-4 relative">
+          <div className="grid grid-cols-4 lg:grid-cols-6 gap-2 p-2 max-h-[420px] overflow-y-auto mt-4 relative">
             {filteredLanguages?.map((lang) => (
               <Button
                 key={`${lang.language}-${lang.name}`}
@@ -71,7 +71,7 @@ export function TranslateLanguagePicker() {
                 onClick={() => onSelectLanguage(lang.language)}
               >
                 <Check className="size-3.5" />
-                {lang.name}
+                <span className="truncate">{lang.name}</span>
               </Button>
             ))}
           </div>

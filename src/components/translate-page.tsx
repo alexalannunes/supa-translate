@@ -22,6 +22,9 @@ import {
   TranslateSpeakButton,
   TranslateSwapLanguage,
 } from "./translate";
+import { TranslateSkeleton } from "./translate-skeleton";
+import { useLanguages } from "@/services/translate/use-languages.query";
+import { useTranslateMutation } from "@/services/translate/use-translate.mutation";
 
 export function TranslatePage() {
   const [fromLang, setFromLang] = useQueryState("fl"); // fl = from language
@@ -38,9 +41,8 @@ export function TranslatePage() {
 
   const [debouncedUserInput, setDebouncedUserInput] = useState("");
 
-  // temporary debounce logic
-
-  console.log({ debouncedUserInput });
+  const { isPending } = useLanguages();
+  const translateMutation = useTranslateMutation();
 
   useEffect(() => {
     const recentStorage = getRecentLanguages();
@@ -101,10 +103,9 @@ export function TranslatePage() {
     storeRecentLanguages(recentLanguages);
   }, [recentLanguages]);
 
-  // skeleton and isPending
-  // if (!recentLanguages.from.length) {
-  //   return <TranslateSkeleton />;
-  // }
+  if (isPending) {
+    return <TranslateSkeleton />;
+  }
 
   return (
     <TranslateContext.Provider
@@ -131,10 +132,11 @@ export function TranslatePage() {
         <div className="font-sans p-8 pb-20 gap-16">
           <main className="flex flex-col gap-4 container mx-auto relative">
             <TranslateLanguagePicker />
-            <div className="flex gap-3 w-full items-center">
+            <div className="flex flex-col lg:flex-row gap-3 w-full items-center">
               <div className="w-full flex gap-2 items-center">
                 <TranslateRecentFromLanguages />
               </div>
+              {/* TODO: should swap input value with translated text */}
               <div className="w-12">
                 <TranslateSwapLanguage />
               </div>
@@ -142,11 +144,16 @@ export function TranslatePage() {
                 <TranslateRecentToLanguages />
               </div>
             </div>
-            <div className="flex gap-3 w-full min-h-52">
+            <div className="flex flex-col gap-3 lg:flex-row w-full min-h-52">
               <div className="relative w-full space-y-2">
                 <TranslateEditableTextarea
-                  onValueChange={setDebouncedUserInput}
+                  onValueChange={(value) => {
+                    if (fromLang && toLang) {
+                      translateMutation.mutate({ value, fromLang, toLang });
+                    }
+                  }}
                 />
+                {debouncedUserInput}
                 <div className="flex gap-2 absolute bottom-2 left-2">
                   <TranslateRecordButton />
                   <TranslateSpeakButton />
